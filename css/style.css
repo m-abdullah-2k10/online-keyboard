@@ -406,6 +406,12 @@ body {
     border: 1px solid #e74c3c;
 }
 
+.status-message.info {
+    background-color: #d6eaf8;
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
 /* ============================================================================
    RESPONSIVE DESIGN
    ============================================================================ */

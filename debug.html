@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Debug</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .debug-panel {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+        .debug-log {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .debug-log-item {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .debug-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .debug-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="keyboard-container">
+        <div class="debug-panel">
+            <h2>Debug Panel</h2>
+            <div>
+                <button class="debug-button" onclick="testKeyboardManager()">Test KeyboardManager</button>
+                <button class="debug-button" onclick="testTextManager()">Test TextManager</button>
+                <button class="debug-button" onclick="testLanguageManager()">Test LanguageManager</button>
+                <button class="debug-button" onclick="testApp()">Test App Init</button>
+                <button class="debug-button" onclick="clearLog()">Clear Log</button>
+            </div>
+            <div class="debug-log" id="debugLog"></div>
+        </div>
+
+        <!-- Header -->
+        <header class="keyboard-header">
+            <h1 class="keyboard-title">Virtual Keyboard</h1>
+        </header>
+
+        <!-- Text Output Area -->
+        <div class="text-area-wrapper">
+            <textarea 
+                id="textInput" 
+                class="text-input" 
+                placeholder="Click keys or type here..."
+                aria-label="Text output area"
+                readonly>
+            </textarea>
+            <div class="text-info">
+                <span id="charCount" class="char-count">Characters: 0</span>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <!-- Language Selection -->
+            <div class="control-group">
+                <label for="languageSelect" class="control-label">Language:</label>
+                <div class="language-buttons" role="group" aria-label="Select language">
+                    <button 
+                        class="lang-btn lang-btn-active" 
+                        data-lang="english"
+                        aria-label="English language"
+                        aria-pressed="true">
+                        English
+                    </button>
+                    <button 
+                        class="lang-btn" 
+                        data-lang="urdu"
+                        aria-label="Urdu language"
+                        aria-pressed="false">
+                        اردو
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="control-group">
+                <label class="control-label">Mode:</label>
+                <div class="mode-buttons" role="group" aria-label="Select keyboard mode">
+                    <button 
+                        class="mode-btn mode-btn-active" 
+                        data-mode="lowercase"
+                        aria-label="Lowercase letters"
+                        aria-pressed="true">
+                        abc
+                    </button>
+                    <button 
+                        class="mode-btn" 
+                        data-mode="uppercase"
+                        aria-label="Uppercase letters"
+                        aria-pressed="false">
+                        ABC
+                    </button>
+                    <button 
+                        class="mode-btn" 
+                        data-mode="symbols"
+                        aria-label="Symbols and numbers"
+                        aria-pressed="false">
+                        123
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="control-group">
+                <button 
+                    id="copyBtn" 
+                    class="action-btn action-btn-copy" 
+                    aria-label="Copy text to clipboard">
+                    Copy
+                </button>
+                <button 
+                    id="clearBtn" 
+                    class="action-btn action-btn-clear" 
+                    aria-label="Clear all text">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Current Mode Indicator -->
+        <div class="mode-indicator">
+            <span id="modeDisplay" class="mode-display">Lowercase Mode</span>
+        </div>
+
+        <!-- Keyboard Grid -->
+        <div class="keyboard-grid" id="keyboardGrid" role="group" aria-label="Virtual keyboard">
+            <!-- Keys will be rendered here by JavaScript -->
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/textManager.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/langManager.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('debugLog');
+            const item = document.createElement('div');
+            item.className = 'debug-log-item';
+            const timestamp = new Date().toLocaleTimeString();
+            item.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(item);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
+        function testKeyboardManager() {
+            try {
+                log('Testing KeyboardManager...');
+                log('Available languages: ' + KeyboardManager.getAllLanguages().join(', '));
+                log('Current language: ' + KeyboardManager.getActiveLanguage());
+                log('Current mode: ' + KeyboardManager.getActiveMode());
+                const layout = KeyboardManager.getLayout();
+                log('Layout rows: ' + layout.length);
+                log('First row: ' + layout[0].join(' '));
+                log('✓ KeyboardManager OK');
+            } catch (e) {
+                log('✗ KeyboardManager ERROR: ' + e.message);
+            }
+        }
+
+        function testTextManager() {
+            try {
+                log('Testing TextManager...');
+                const textarea = document.getElementById('textInput');
+                TextManager.init(textarea);
+                TextManager.setText('Hello');
+                log('Set text to: ' + TextManager.getText());
+                TextManager.insertCharacter('!');
+                log('After insert: ' + TextManager.getText());
+                log('Char length: ' + TextManager.getTextLength());
+                log('✓ TextManager OK');
+            } catch (e) {
+                log('✗ TextManager ERROR: ' + e.message);
+            }
+        }
+
+        function testLanguageManager() {
+            try {
+                log('Testing LanguageManager...');
+                LanguageManager.init();
+                log('Available languages: ' + LanguageManager.getAvailableLanguages().join(', '));
+                log('Current language: ' + LanguageManager.getActiveLanguage());
+                LanguageManager.setLanguage('urdu');
+                log('After switch: ' + LanguageManager.getActiveLanguage());
+                log('✓ LanguageManager OK');
+            } catch (e) {
+                log('✗ LanguageManager ERROR: ' + e.message);
+            }
+        }
+
+        function testApp() {
+            try {
+                log('Testing App initialization...');
+                log('✓ App initialized successfully');
+            } catch (e) {
+                log('✗ App ERROR: ' + e.message);
+            }
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            log('Page loaded, testing all modules...');
+            testKeyboardManager();
+            testTextManager();
+            testLanguageManager();
+            testApp();
+        });
+    </script>
+</body>
+</html>
