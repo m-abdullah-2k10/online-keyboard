@@ -373,6 +373,25 @@ body {
     font-family: Arial, sans-serif;
 }
 
+/* Wide space key */
+.key-space {
+    flex: 6;
+    max-width: none;
+    min-width: 160px;
+}
+
+/* Backspace key styling */
+.key-backspace {
+    flex: 1.2;
+    max-width: 80px;
+    background-color: #f5f7fa;
+}
+
+.keyboard-controls {
+    align-items: center;
+    justify-content: center;
+}
+
 /* ============================================================================
    STATUS MESSAGE
    ============================================================================ */
